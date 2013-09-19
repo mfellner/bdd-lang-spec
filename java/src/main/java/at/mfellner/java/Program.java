@@ -16,6 +16,8 @@
 
 package at.mfellner.java;
 
+import at.mfellner.java.message.Message;
+import at.mfellner.java.message.MessageHandler;
 import at.mfellner.java.script.Script;
 import at.mfellner.java.script.StartScript;
 
@@ -32,6 +34,8 @@ public class Program implements Script.ScriptCallback {
 
     public Program() {
         mScripts = new LinkedList<>();
+        Message.clear();
+        MessageHandler.INSTANCE.clear();
     }
 
     public void setCallback(ProgramCallback callback) {

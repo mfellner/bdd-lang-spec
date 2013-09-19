@@ -33,6 +33,10 @@ public enum MessageHandler {
         mRegistry = new HashMap<>();
     }
 
+    public void clear() {
+        mRegistry.clear();
+    }
+
     public void register(String message, MessageResponder responder) {
         if (mRegistry.containsKey(message)) {
             List<MessageResponder> list = mRegistry.get(message);

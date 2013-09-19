@@ -33,6 +33,10 @@ public class Message {
         }
     }
 
+    public static void clear() {
+        MESSAGES.clear();
+    }
+
     private Message(String message) {
         mMessage = message;
     }
