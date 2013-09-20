@@ -18,21 +18,19 @@ package at.mfellner.java.script;
 
 import at.mfellner.java.message.Message;
 
-public class InterruptableWhenScript extends WhenScript {
+public class RestartableWhenScript extends WhenScript {
 
-    public InterruptableWhenScript(String message) {
+    public RestartableWhenScript(String message) {
         super(message);
     }
 
     @Override
     public void respondTo(String message) {
         if (mMessage.equals(message)) {
+            // Interrupt execution of the currently running instance.
             this.stop();
-            Message m = Message.getMessage(mMessage);
-            synchronized (m) {
-                m.notifyAll();
-            }
-            m.startResponse();
+            // Inform all waiting scripts to continue.
+            Message.getMessage(mMessage).restartResponse();
             this.start();
         }
     }

@@ -63,4 +63,9 @@ public class Message {
             mReponses--;
         }
     }
+
+    public synchronized void restartResponse() {
+        notifyAll();
+        mReponses = 1;
+    }
 }
