@@ -21,7 +21,7 @@ import at.mfellner.java.brick.BroadcastBrick;
 import at.mfellner.java.brick.BroadcastWaitBrick;
 import at.mfellner.java.brick.PrintBrick;
 import at.mfellner.java.brick.WaitBrick;
-import at.mfellner.java.script.InterruptableWhenScript;
+import at.mfellner.java.script.RestartableWhenScript;
 import at.mfellner.java.script.Script;
 import at.mfellner.java.script.StartScript;
 import at.mfellner.java.script.WhenScript;
@@ -65,9 +65,9 @@ public class ScriptSteps {
         mProgram.addScript(script);
     }
 
-    @Given("^I have an interruptable When '(\\w+)' script$")
-    public void I_have_an_interruptable_when_script(final String message) {
-        Script script = new InterruptableWhenScript(message);
+    @Given("^I have a restartable When '(\\w+)' script$")
+    public void I_have_a_restartable_when_script(final String message) {
+        Script script = new RestartableWhenScript(message);
         mProgram.addScript(script);
     }
 
@@ -90,8 +90,14 @@ public class ScriptSteps {
     }
 
     @And("^this script has a Wait (\\d+) milliseconds brick$")
-    public void script_has_a_wait_brick(long millis) {
+    public void script_has_a_wait_ms_brick(long millis) {
         WaitBrick brick = new WaitBrick(millis);
+        mProgram.getLastScript().addBrick(brick);
+    }
+
+    @And("^this script has a Wait (\\d+.?\\d*) seconds? brick$")
+    public void script_has_a_wait_s_brick(int seconds) {
+        WaitBrick brick = new WaitBrick(seconds * 1000);
         mProgram.getLastScript().addBrick(brick);
     }
 

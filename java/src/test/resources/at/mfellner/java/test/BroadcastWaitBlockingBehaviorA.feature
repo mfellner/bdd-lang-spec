@@ -1,9 +1,10 @@
-Feature: Broadcast & Wait Blocking Behavior (Scratch)
+Feature: Broadcast & Wait Blocking Behavior (like in Scratch)
 
   If a broadcast is sent while a Broadcast Wait brick is waiting for the same message, the
-  responding When scripts should be restarted and the Broadcast Wait brick should stop waiting.
+  responding When scripts should be restarted and the Broadcast Wait brick should stop waiting
+  and immeditely continue executing the rest of the script.
 
-  Scenario: Model A
+  Scenario: A waiting BroadcastWait brick is unblocked when the same broadcast message is resent
 
     Given I have a Start script
     And this script has a BroadcastWait 'hello' brick
@@ -13,15 +14,15 @@ Feature: Broadcast & Wait Blocking Behavior (Scratch)
     """
 
     Given I have a Start script
-    And this script has a Wait 200 milliseconds brick
+    And this script has a Wait 10 milliseconds brick
     And this script has a Broadcast 'hello' brick
 
-    Given I have an interruptable When 'hello' script
+    Given I have a restartable When 'hello' script
     And this script has a Print brick with
     """
     I am the When 'hello' script (1).
     """
-    And this script has a Wait 400 milliseconds brick
+    And this script has a Wait 20 milliseconds brick
     And this script has a Print brick with
     """
     I am the When 'hello' script (2).

@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(format = "html:target/cucumber-report.html"
-//        , features = "classpath:at/mfellner/java/test/Broadcast.feature"
+//        , features = "classpath:at/mfellner/java/test/BroadcastBrick.feature"
 )
 public class RunCukesTest {
 }
