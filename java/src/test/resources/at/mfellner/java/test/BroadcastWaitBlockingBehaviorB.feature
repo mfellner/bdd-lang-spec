@@ -3,19 +3,23 @@ Feature: Broadcast & Wait Blocking Behavior B
   If a broadcast is sent while a Broadcast Wait brick is waiting for the same message, the
   Broadcast Wait brick should continue waiting for the additional responding When scripts.
 
+  Background:
+    Given I have a Program
+    And I have an Object 'Object'
+
   Scenario: A waiting Start script continues to wait when a When script starts for the second time.
 
-    Given I have a Start script
+    Given 'Object' has a Start script
     And this script has a BroadcastWait 'hello' brick
     And this script has a Print brick with
     """
     I am the first Start script.
     """
 
-    Given I have a Start script
+    Given 'Object' has a Start script
     And this script has a Broadcast 'hello' brick
 
-    Given I have a When 'hello' script
+    Given 'Object' has a When 'hello' script
     And this script has a Print brick with
     """
     I am the When 'hello' script (1).

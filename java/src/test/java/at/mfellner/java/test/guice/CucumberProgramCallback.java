@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-package at.mfellner.java.brick;
+package at.mfellner.java.test.guice;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import at.mfellner.java.Program;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-public class PrintBrick extends Brick {
-    private final String mString;
-    private PrintStream mPrintStream;
+public class CucumberProgramCallback implements Program.ProgramCallback {
+    private final Object mWaitLock;
 
-    public PrintBrick(String s) {
-        mString = s;
-        mPrintStream = System.out;
-    }
-
-    public PrintBrick(String s, OutputStream os) {
-        mString = s;
-        mPrintStream = new PrintStream(os);
+    @Inject
+    public CucumberProgramCallback(@Named("WaitLock") Object waitLock) {
+        mWaitLock = waitLock;
     }
 
     @Override
-    public Runnable getRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                mPrintStream.println(mString);
-            }
-        };
+    public void onProgramFinished(Program program) {
+        synchronized (mWaitLock) {
+            mWaitLock.notifyAll();
+        }
     }
 }

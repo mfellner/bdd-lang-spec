@@ -18,60 +18,60 @@ package at.mfellner.java;
 
 import at.mfellner.java.message.Message;
 import at.mfellner.java.message.MessageHandler;
-import at.mfellner.java.script.Script;
-import at.mfellner.java.script.StartScript;
+import com.google.inject.Inject;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Program implements Script.ScriptCallback {
-    private final LinkedList<Script> mScripts;
-    private ProgramCallback mCallback;
-    private int mRunningScripts;
+public class Program implements ScriptableObject.ObjectCallback {
+    private final Map<String, ScriptableObject> mObjects;
+    private final ProgramCallback mCallback;
+    private int mNumObjectsScriptsFinished;
 
     public interface ProgramCallback {
-        public void onProgramFinish(Program program);
+        public void onProgramFinished(Program program);
     }
 
-    public Program() {
-        mScripts = new LinkedList<>();
+    @Inject
+    public Program(ProgramCallback callback) {
+        mCallback = callback;
+        mObjects = new HashMap<>();
+    }
+
+    public void reset() {
+        mObjects.clear();
         Message.clear();
         MessageHandler.INSTANCE.clear();
     }
 
-    public void setCallback(ProgramCallback callback) {
-        mCallback = callback;
+    public void addNewObject(String name) {
+        ScriptableObject object = new ScriptableObject(name, this);
+        mObjects.put(name, object);
     }
 
-    public void addScript(Script script) {
-        script.setCallaback(this);
-        mScripts.add(script);
-    }
-
-    public Script getLastScript() {
-        return mScripts.getLast();
+    public ScriptableObject getObject(String name) {
+        return mObjects.get(name);
     }
 
     public void start() {
-        for (Script script : mScripts) {
-            if (script instanceof StartScript) {
-                ((StartScript) script).startScript();
-            }
+        for (ScriptableObject object : mObjects.values()) {
+            object.onStart();
         }
     }
 
     public boolean isRunning() {
-        return mRunningScripts != 0;
+        for (ScriptableObject object : mObjects.values()) {
+            if (object.getScriptsRunning() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public void onScriptStart(Script script) {
-        mRunningScripts++;
-    }
-
-    @Override
-    public void onScriptFinish(Script script) {
-        if (--mRunningScripts == 0 && mCallback != null) {
-            mCallback.onProgramFinish(this);
+    public synchronized void onScriptsFinished(ScriptableObject object) {
+        if (++mNumObjectsScriptsFinished == mObjects.size()) {
+            mCallback.onProgramFinished(this);
         }
     }
 }

@@ -2,8 +2,12 @@ Feature: Print brick
 
   A Print brick prints a given text on the screen.
 
+  Background:
+    Given I have a Program
+    And I have an Object 'Object'
+
   Scenario: A Print brick prints one line
-    Given I have a Start script
+    Given 'Object' has a Start script
     And this script has a Print brick with
     """
     Hello, world!

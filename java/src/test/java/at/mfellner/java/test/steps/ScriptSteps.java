@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package at.mfellner.java.test;
+package at.mfellner.java.test.steps;
 
-import at.mfellner.java.*;
+import at.mfellner.java.Program;
 import at.mfellner.java.brick.BroadcastBrick;
 import at.mfellner.java.brick.BroadcastWaitBrick;
 import at.mfellner.java.brick.PrintBrick;
@@ -28,95 +28,72 @@ import at.mfellner.java.script.WhenScript;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 
-import java.io.ByteArrayOutputStream;
-
-import static org.junit.Assert.assertEquals;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class ScriptSteps {
-    Program mProgram;
-    ByteArrayOutputStream mOutput;
+    private final OutputStream mOutput;
+    private final Program mProgram;
+    Script mLastScript;
+
+    @Inject
+    public ScriptSteps(OutputStream output, Program program) {
+        mOutput = output;
+        mProgram = program;
+    }
 
     @Before
-    public void before() {
-        mProgram = new Program();
-        mOutput = new ByteArrayOutputStream();
-        mProgram.setCallback(new Program.ProgramCallback() {
-            @Override
-            public void onProgramFinish(Program program) {
-                synchronized (program) {
-                    program.notify();
-                }
-            }
-        });
+    public void before() throws IOException {
+        mLastScript = null;
     }
 
-    @Given("^I have a Start script$")
-    public void I_have_a_start_script() {
-        Script script = new StartScript();
-        mProgram.addScript(script);
+    @Given("^'(\\w+)' has a Start script$")
+    public void object_has_a_start_script(String object) {
+        mLastScript = new StartScript();
+        mProgram.getObject(object).addScript(mLastScript);
     }
 
-    @Given("^I have a When '(\\w+)' script$")
-    public void I_have_a_when_script(final String message) {
-        Script script = new WhenScript(message);
-        mProgram.addScript(script);
+    @Given("^'(\\w+)' has a When '(\\w+)' script$")
+    public void object_has_a_when_script(String object, String message) {
+        mLastScript = new WhenScript(message);
+        mProgram.getObject(object).addScript(mLastScript);
     }
 
-    @Given("^I have a restartable When '(\\w+)' script$")
-    public void I_have_a_restartable_when_script(final String message) {
-        Script script = new RestartableWhenScript(message);
-        mProgram.addScript(script);
+    @Given("^'(\\w+)' has a restartable When '(\\w+)' script$")
+    public void object_has_a_restartable_when_script(String object, String message) {
+        mLastScript = new RestartableWhenScript(message);
+        mProgram.getObject(object).addScript(mLastScript);
     }
 
     @And("^this script has a Broadcast '(\\w+)' brick$")
     public void script_has_a_broadcast_brick(String message) {
         BroadcastBrick brick = new BroadcastBrick(message);
-        mProgram.getLastScript().addBrick(brick);
+        mLastScript.addBrick(brick);
     }
 
     @And("^this script has a BroadcastWait '(\\w+)' brick$")
     public void script_has_a_broadcast_wait_brick(String message) {
         BroadcastWaitBrick brick = new BroadcastWaitBrick(message);
-        mProgram.getLastScript().addBrick(brick);
+        mLastScript.addBrick(brick);
     }
 
     @And("^this script has a Print brick with$")
     public void script_has_a_print_brick(String string) {
         PrintBrick brick = new PrintBrick(string, mOutput);
-        mProgram.getLastScript().addBrick(brick);
+        mLastScript.addBrick(brick);
     }
 
     @And("^this script has a Wait (\\d+) milliseconds brick$")
     public void script_has_a_wait_ms_brick(long millis) {
         WaitBrick brick = new WaitBrick(millis);
-        mProgram.getLastScript().addBrick(brick);
+        mLastScript.addBrick(brick);
     }
 
     @And("^this script has a Wait (\\d+.?\\d*) seconds? brick$")
     public void script_has_a_wait_s_brick(int seconds) {
         WaitBrick brick = new WaitBrick(seconds * 1000);
-        mProgram.getLastScript().addBrick(brick);
-    }
-
-    @When("^I start the program$")
-    public void I_start_the_program() {
-        mProgram.start();
-    }
-
-    @And("^I wait until the program has stopped$")
-    public void I_wait_until_the_program_has_stopped() throws InterruptedException {
-        if (mProgram.isRunning()) {
-            synchronized (mProgram) {
-                mProgram.wait();
-            }
-        }
-    }
-
-    @Then("^I should see$")
-    public void I_should_see(String string) {
-        assertEquals(string, mOutput.toString());
+        mLastScript.addBrick(brick);
     }
 }

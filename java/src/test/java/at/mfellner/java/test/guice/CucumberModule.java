@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-package at.mfellner.java.brick;
+package at.mfellner.java.test.guice;
 
+import at.mfellner.java.Program;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
-public class PrintBrick extends Brick {
-    private final String mString;
-    private PrintStream mPrintStream;
-
-    public PrintBrick(String s) {
-        mString = s;
-        mPrintStream = System.out;
-    }
-
-    public PrintBrick(String s, OutputStream os) {
-        mString = s;
-        mPrintStream = new PrintStream(os);
-    }
-
+public class CucumberModule extends AbstractModule {
     @Override
-    public Runnable getRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                mPrintStream.println(mString);
-            }
-        };
+    public void configure() {
+        bind(Program.class).asEagerSingleton();
+        bind(Program.ProgramCallback.class).to(CucumberProgramCallback.class);
+        bind(Object.class).annotatedWith(Names.named("WaitLock")).toInstance(new Object());
+        bind(OutputStream.class).to(ByteArrayOutputStream.class).asEagerSingleton();
     }
 }

@@ -2,15 +2,19 @@ Feature: When script
 
   Multiple When scripts should run sequentially after one another.
 
+  Background:
+    Given I have a Program
+    And I have an Object 'Object'
+
   Scenario: A program with two start scripts and one When script
-    Given I have a Start script
+    Given 'Object' has a Start script
     And this script has a Broadcast 'hello' brick
 
-    Given I have a Start script
+    Given 'Object' has a Start script
     And this script has a Wait 20 milliseconds brick
     And this script has a Broadcast 'hello' brick
 
-    Given I have a When 'hello' script
+    Given 'Object' has a When 'hello' script
     And this script has a Wait 10 milliseconds brick
     And this script has a Print brick with
     """

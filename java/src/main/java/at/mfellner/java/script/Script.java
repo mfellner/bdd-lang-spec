@@ -29,7 +29,7 @@ public abstract class Script {
     public interface ScriptCallback {
         public void onScriptStart(Script script);
 
-        public void onScriptFinish(Script script);
+        public void onScriptFinished(Script script);
     }
 
     private class ScriptThread extends Thread {
@@ -94,7 +94,7 @@ public abstract class Script {
 
     private void onScriptFinish() {
         if (mCallback != null) {
-            mCallback.onScriptFinish(this);
+            mCallback.onScriptFinished(this);
         }
     }
 }
